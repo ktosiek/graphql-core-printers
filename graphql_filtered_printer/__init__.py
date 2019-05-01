@@ -8,7 +8,7 @@ import json
 
 
 class FilteredPrinter:
-    __slots__ = ('_filter_arguments', )
+    __slots__ = ("_filter_arguments",)
 
     def __init__(self, filter_arguments):
         self._filter_arguments = filter_arguments
@@ -22,7 +22,7 @@ class FilteredPrinter:
 
 
 class FilteringVisitor(PrintingVisitor):
-    __slots__ = ('_filter_arguments', '_variable_uses', '_tainted_uses')
+    __slots__ = ("_filter_arguments", "_variable_uses", "_tainted_uses")
 
     def __init__(self, filter_arguments, variable_names):
         self._filter_arguments = set(filter_arguments)
@@ -31,14 +31,14 @@ class FilteringVisitor(PrintingVisitor):
 
     def filter_variables(self, variables):
         return {
-            k: '[FILTERED]' if self.variable_is_tainted(k) else self._filter_value(v)
+            k: "[FILTERED]" if self.variable_is_tainted(k) else self._filter_value(v)
             for k, v in variables.items()
         }
-    
+
     def _filter_value(self, value):
         if isinstance(value, dict):
             return {
-                k: '[FILTERED]' if self._should_filter(k) else self._filter_value(v)
+                k: "[FILTERED]" if self._should_filter(k) else self._filter_value(v)
                 for k, v in value.items()
             }
         if isinstance(value, list):
@@ -63,7 +63,7 @@ class FilteringVisitor(PrintingVisitor):
         # type: (Any, *Any) -> str
         value = node.value
         if self._should_filter(node.name):
-            if node.value.startswith('$'):
+            if node.value.startswith("$"):
                 self._tainted_uses[node.value[1:]] += 1
             else:
                 value = '"[FILTERED]"'
