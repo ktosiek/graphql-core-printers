@@ -2,8 +2,6 @@ from graphql.language.parser import parse
 
 from graphql_filtered_printer import FilteredPrinter
 
-from .schema import Schema
-
 
 printer = FilteredPrinter(filter_arguments=["password", "token"])
 
