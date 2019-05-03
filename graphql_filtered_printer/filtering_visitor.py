@@ -1,18 +1,21 @@
-from typing import Any, Mapping, Optional
-
 from collections import defaultdict
-from graphql.language.printer import PrintingVisitor, join, wrap
 
-import json
+from graphql.language.printer import PrintingVisitor
 
 
 class FilteringVisitor(PrintingVisitor):
-    __slots__ = ("_filter_arguments", "_variable_uses", "_tainted_uses")
+    __slots__ = (
+        "_filter_arguments",
+        "_variable_uses",
+        "_tainted_uses",
+        "_tainted_context",
+    )
 
     def __init__(self, filter_arguments, variable_names):
         self._filter_arguments = set(filter_arguments)
         self._variable_uses = defaultdict(int)
         self._tainted_uses = defaultdict(int)
+        self._tainted_context = False
 
     def filter_variables(self, variables):
         return {
@@ -37,6 +40,8 @@ class FilteringVisitor(PrintingVisitor):
 
     def leave_Variable(self, node, *args):
         self._variable_uses[node.name] += 1
+        if self._tainted_context:
+            self._tainted_uses[node.name] += 1
         return super().leave_Variable(node, *args)
 
     def enter_VariableDefinition(self, node, *args):
@@ -44,19 +49,18 @@ class FilteringVisitor(PrintingVisitor):
         var_name = node.variable.name.value
         self._variable_uses[var_name] -= 1
 
-    def leave_Argument(self, node, *args):
-        # type: (Any, *Any) -> str
-        value = node.value
-        if self._should_filter(node.name):
-            if node.value.startswith("$"):
-                self._tainted_uses[node.value[1:]] += 1
-            else:
-                value = '"[FILTERED]"'
-        return "{0.name}: {1}".format(node, value)
+    def enter_Argument(self, node, *args):
+        if self._should_filter(node.name.value):
+            self._tainted_context = True
 
-    def leave_ObjectField(self, node, *args):
-        # type: (Any, *Any) -> str
-        return node.name + ": " + node.value
+    def leave_Argument(self, node, *args):
+        self._tainted_context = False
+        return super().leave_Argument(node, *args)
+
+    def leave_StringValue(self, node, *args):
+        if self._tainted_context:
+            return '"[FILTERED]"'
+        return super().leave_StringValue(node, *args)
 
     def _should_filter(self, arg_name):
         return arg_name in self._filter_arguments

@@ -57,3 +57,30 @@ snapshots['test_filtering_input_object 1'] = (
         }
     }
 )
+
+snapshots['test_filtering_variable_shared_with_a_list 1'] = (
+    '''mutation Login($password: String!) {
+  login(username: "asdf", password: $password) {
+    token
+  }
+  hideArgs(input: ["now you see me", $password]) {
+    __typename
+  }
+}
+''',
+    {
+        'password': '123456'
+    }
+)
+
+snapshots['test_filtering_variable_in_a_list 1'] = (
+    '''mutation Login($pwd: String!) {
+  login(username: "asdf", password: [$pwd]) {
+    token
+  }
+}
+''',
+    {
+        'pwd': '[FILTERED]'
+    }
+)
