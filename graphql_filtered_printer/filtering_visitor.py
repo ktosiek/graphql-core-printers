@@ -11,7 +11,7 @@ class FilteringVisitor(PrintingVisitor):
         "_tainted_context",
     )
 
-    def __init__(self, filter_arguments, variable_names):
+    def __init__(self, filter_arguments):
         self._filter_arguments = set(filter_arguments)
         self._variable_uses = defaultdict(int)
         self._tainted_uses = defaultdict(int)

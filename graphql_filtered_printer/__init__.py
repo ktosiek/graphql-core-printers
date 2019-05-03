@@ -14,6 +14,6 @@ class FilteredPrinter:
     def __call__(self, ast, variables: Optional[Mapping[str, Any]] = None):
         if variables is None:
             variables = {}
-        visitor = FilteringVisitor(self._filter_arguments, variables.keys())
+        visitor = FilteringVisitor(self._filter_arguments)
         query = visit(ast, visitor)
         return query, visitor.filter_variables(variables)
