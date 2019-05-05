@@ -1,5 +1,5 @@
 from graphql.language.parser import parse
-
+from graphql.language.tests.fixtures import KITCHEN_SINK
 from graphql_filtered_printer import FilteredPrinter
 
 
@@ -91,3 +91,10 @@ def test_filtering_variable_in_a_list(snapshot):
     )
 
     snapshot.assert_match(printer(ast, {"pwd": "123456"}))
+
+
+def test_kitchen_sink():
+    ast = parse(KITCHEN_SINK)
+    output, _vars = printer(ast, {})
+    ast2 = parse(output)
+    assert ast == ast2
