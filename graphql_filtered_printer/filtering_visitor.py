@@ -1,9 +1,9 @@
 from collections import defaultdict
 
-from graphql.language.printer import PrintingVisitor
+from graphql.language.visitor import Visitor
 
 
-class FilteringVisitor(PrintingVisitor):
+class FilteringVisitor(Visitor):
     __slots__ = (
         "_filter_arguments",
         "_variable_uses",
@@ -42,7 +42,6 @@ class FilteringVisitor(PrintingVisitor):
         self._variable_uses[node.name] += 1
         if self._tainted_context:
             self._tainted_uses[node.name] += 1
-        return super().leave_Variable(node, *args)
 
     def enter_VariableDefinition(self, node, *args):
         # compensate for leave_Variable inside the VariableDefinition
@@ -55,12 +54,10 @@ class FilteringVisitor(PrintingVisitor):
 
     def leave_Argument(self, node, *args):
         self._tainted_context = False
-        return super().leave_Argument(node, *args)
 
     def leave_StringValue(self, node, *args):
         if self._tainted_context:
             return '"[FILTERED]"'
-        return super().leave_StringValue(node, *args)
 
     def _should_filter(self, arg_name):
         return arg_name in self._filter_arguments
