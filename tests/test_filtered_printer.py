@@ -93,8 +93,8 @@ def test_filtering_variable_in_a_list(snapshot):
     snapshot.assert_match(printer(ast, {"pwd": "123456"}))
 
 
-def test_kitchen_sink():
+def test_kitchen_sink(benchmark):
     ast = parse(KITCHEN_SINK)
-    output, _vars = printer(ast, {})
+    output, _vars = benchmark(printer, ast, {})
     ast2 = parse(output)
     assert ast == ast2

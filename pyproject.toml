@@ -12,6 +12,7 @@ graphql-core = "^2.1"
 [tool.poetry.dev-dependencies]
 pytest = "^4.4"
 snapshottest = "^0.5.0"
+pytest-benchmark = "^3.2"
 
 [tool.black]
 exclude = '/(\.git|tests/snapshots)/'
