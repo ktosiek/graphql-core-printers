@@ -1,12 +1,17 @@
+import pytest
 from graphql.language.parser import parse
 from graphql.language.tests.fixtures import KITCHEN_SINK
 from graphql_filtered_printer import FilteredPrinter
 
 
-printer = FilteredPrinter(filter_arguments=["password", "token"])
+@pytest.fixture(params=["nice", "compact"])
+def printer(request):
+    return FilteredPrinter(
+        filter_arguments=["password", "token"], compact=request.param == "compact"
+    )
 
 
-def test_filtering_inline_password(snapshot):
+def test_filtering_inline_password(snapshot, printer):
     ast = parse(
         """
         mutation {
@@ -20,7 +25,7 @@ def test_filtering_inline_password(snapshot):
     snapshot.assert_match(printer(ast))
 
 
-def test_filtering_password_variable(snapshot):
+def test_filtering_password_variable(snapshot, printer):
     ast = parse(
         """
         mutation Login($username:String!, $password:String!) {
@@ -34,7 +39,7 @@ def test_filtering_password_variable(snapshot):
     snapshot.assert_match(printer(ast, {"username": "someuser", "password": "123456"}))
 
 
-def test_filtering_shared_variable(snapshot):
+def test_filtering_shared_variable(snapshot, printer):
     ast = parse(
         """
         mutation Login($username:String!) {
@@ -48,7 +53,7 @@ def test_filtering_shared_variable(snapshot):
     snapshot.assert_match(printer(ast, {"username": "someuser"}))
 
 
-def test_filtering_input_object(snapshot):
+def test_filtering_input_object(snapshot, printer):
     ast = parse(
         """
         mutation Login($input:LoginInput!) {
@@ -64,7 +69,7 @@ def test_filtering_input_object(snapshot):
     )
 
 
-def test_filtering_variable_shared_with_a_list(snapshot):
+def test_filtering_variable_shared_with_a_list(snapshot, printer):
     ast = parse(
         """
         mutation Login($password:String!) {
@@ -79,7 +84,7 @@ def test_filtering_variable_shared_with_a_list(snapshot):
     snapshot.assert_match(printer(ast, {"password": "123456"}))
 
 
-def test_filtering_variable_in_a_list(snapshot):
+def test_filtering_variable_in_a_list(snapshot, printer):
     ast = parse(
         """
         mutation Login($pwd:String!) {
@@ -93,7 +98,7 @@ def test_filtering_variable_in_a_list(snapshot):
     snapshot.assert_match(printer(ast, {"pwd": "123456"}))
 
 
-def test_kitchen_sink(benchmark):
+def test_kitchen_sink(benchmark, printer):
     ast = parse(KITCHEN_SINK)
     output, _vars = benchmark(printer, ast, {})
     ast2 = parse(output)
