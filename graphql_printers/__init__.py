@@ -21,3 +21,7 @@ class FilteredPrinter:
         visitor = ParallelVisitor([filtering_visitor, self._printer_class()])
         query = visit(ast, visitor)
         return query, filtering_visitor.filter_variables(variables)
+
+
+def compact_print_ast(ast):
+    return visit(ast, CompactPrintingVisitor())
