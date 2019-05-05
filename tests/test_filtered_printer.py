@@ -1,7 +1,7 @@
 import pytest
 from graphql.language.parser import parse
 from graphql.language.tests.fixtures import KITCHEN_SINK
-from graphql_filtered_printer import FilteredPrinter
+from graphql_printers import FilteredPrinter
 
 
 @pytest.fixture(params=["nice", "compact"])

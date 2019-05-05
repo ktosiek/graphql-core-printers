@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "graphql-filtered-printer"
+name = "graphql-core-printers"
 version = "0.1.0"
 description = "Print GraphQL queries while masking secrets. Useful for logging with graphql-core."
 authors = ["Tomasz Kontusz <tomasz.kontusz@gmail.com>"]

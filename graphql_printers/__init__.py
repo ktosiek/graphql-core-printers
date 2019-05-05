@@ -1,6 +1,6 @@
 from typing import Any, Mapping, Optional
 
-from graphql_filtered_printer.compact_printing_visitor import CompactPrintingVisitor
+from graphql_printers.compact_printing_visitor import CompactPrintingVisitor
 from .filtering_visitor import FilteringVisitor
 from graphql.language.printer import PrintingVisitor
 
